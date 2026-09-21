@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@layer base {
+  body { @apply bg-slate-100 text-slate-800 antialiased; }
+}
+
+/* Small set of reusable component classes (Tailwind v4: @apply only works with real utilities) */
+@layer components {
+  .btn-primary, .btn-secondary, .btn-danger, .btn-success {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary { @apply bg-indigo-600 text-white hover:bg-indigo-700; }
+  .btn-secondary { @apply border border-slate-300 bg-white text-slate-700 hover:bg-slate-50; }
+  .btn-danger { @apply bg-red-600 text-white hover:bg-red-700; }
+  .btn-success { @apply bg-emerald-600 text-white hover:bg-emerald-700; }
+  .input { @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100; }
+  .label { @apply mb-1 block text-sm font-medium text-slate-600; }
+  .card { @apply rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200; }
+  .th { @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500; }
+  .td { @apply px-4 py-3 text-sm; }
+}
+
+@media print {
+  aside, header, button, select, input { display: none !important; }
+}
