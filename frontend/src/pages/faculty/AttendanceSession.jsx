@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import api, { errorMessage } from '../../services/api'
 import Camera from '../../components/Camera'
-import { Alert, PageHeader, PercentBadge, StatusBadge, fmtDate } from '../../components/ui'
+import { Alert, PageHeader, PercentBadge, StatusBadge, fmtDate, fmtTime } from '../../components/ui'
 
 const SCAN_EVERY_MS = 2000
 
@@ -124,7 +124,7 @@ export default function AttendanceSession() {
   const faceOk = boxes.length > 0
   return (
     <div>
-      <PageHeader title="Attendance Session" subtitle={`${session.subject} · ${session.course} · Sem ${session.semester} · Section ${session.section} · ${fmtDate(session.date)} ${session.start_time}`}>
+      <PageHeader title="Attendance Session" subtitle={`${session.subject} · ${session.course} · Sem ${session.semester} · Section ${session.section} · ${fmtDate(session.date)} ${fmtTime(session.start_time)}`}>
         <StatusBadge status="active" />
         <button className="btn-secondary" onClick={() => setScanning((s) => !s)}>{scanning ? 'Pause' : 'Resume'}</button>
         <button className="btn-danger" onClick={endSession}>End Session</button>

@@ -63,5 +63,12 @@ export function PageHeader({ title, subtitle, children }) {
   )
 }
 
-export const fmtTime = (t) => (t ? t.slice(0, 8) : '-')
+export const fmtTime = (t) => {
+  if (!t) return '-'
+  const [hStr, mStr, sStr] = t.split(':')
+  let h = parseInt(hStr, 10)
+  const ampm = h >= 12 ? 'PM' : 'AM'
+  h = h % 12 || 12
+  return `${h}:${mStr}:${sStr ? sStr.slice(0, 2) : '00'} ${ampm}`
+}
 export const fmtDate = (d) => (d ? d.split('-').reverse().join('-') : '-')   // 2026-09-21 -> 21-09-2026
