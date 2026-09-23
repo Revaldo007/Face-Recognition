@@ -53,11 +53,18 @@ export default function AttendanceSession() {
         setMessage(data.message)
         setBoxes(data.faces.map((f) => ({
           ...f.box,
-          color: f.recognized ? 'green' : f.status === 'NOT_RECOGNIZED' ? 'red' : 'amber',
-          label: f.student?.name || (f.status === 'NOT_RECOGNIZED' ? 'Unknown' : ''),
+          color: f.recognized ? 'green'
+               : f.status === 'SPOOF_DETECTED' ? 'red'
+               : f.status === 'NOT_RECOGNIZED' ? 'red'
+               : 'amber',
+          label: f.recognized ? f.student?.name
+               : f.status === 'SPOOF_DETECTED' ? '🛑 Liveness Failed'
+               : f.status === 'NOT_RECOGNIZED' ? 'Unknown'
+               : '',
         })))
-        const hit = data.faces.find((f) => f.recognized) || data.faces[0]
-        if (hit) setLast(hit)
+        // Don't update 'last' card for spoof frames
+        const hit = data.faces.find((f) => f.recognized || f.status === 'NOT_RECOGNIZED') || data.faces[0]
+        if (hit && hit.status !== 'SPOOF_DETECTED') setLast(hit)
         if (data.faces.some((f) => f.status === 'PRESENT')) await refreshSession(session.id)
       } catch (err) {
         setMessage(errorMessage(err))

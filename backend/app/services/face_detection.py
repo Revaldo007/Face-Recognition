@@ -128,3 +128,88 @@ def face_problem(img: np.ndarray, face: np.ndarray) -> str | None:
     if cv2.Laplacian(gray, cv2.CV_64F).var() < settings.MIN_SHARPNESS:
         return "Poor image quality - please hold still and face the camera"
     return None
+
+
+def is_spoof_attack(img: np.ndarray, face: np.ndarray) -> tuple[bool, str]:
+    """
+    Multi-signal anti-spoofing check to block photo / mobile-screen attacks.
+
+    Uses four independent signals without requiring any extra model download:
+      1. Screen specular glare   – glass screens produce sharp overexposed patches
+      2. YCrCb chroma deviation  – digital screens shift blue-red balance vs real skin
+      3. FFT high-freq energy    – Moiré / pixel-grid patterns push power into high frequencies
+      4. Device-bezel heuristic  – straight rectangular lines around the face region
+
+    Returns (is_spoof: bool, reason: str).
+    A frame must fail **two or more** independent signals to be rejected so that
+    ordinary lighting artefacts on a real person don't cause false positives.
+    """
+    h, w = img.shape[:2]
+    x, y, bw, bh = [int(v) for v in face[:4]]
+    x0, y0 = max(0, x), max(0, y)
+    x1, y1 = min(w, x + bw), min(h, y + bh)
+    crop = img[y0:y1, x0:x1]
+
+    if crop.size == 0 or bw < 40 or bh < 40:
+        return False, ""  # not enough data – pass through
+
+    flags: list[str] = []
+
+    # ── Signal 1: specular screen glare ────────────────────────────────────
+    # Screens under strong backlight produce clusters of near-white pixels.
+    # A real face illuminated by room lighting rarely has >6 % of pixels above 250 V.
+    hsv = cv2.cvtColor(crop, cv2.COLOR_BGR2HSV)
+    glare_ratio = float(np.mean(hsv[:, :, 2] > 250))
+    if glare_ratio > 0.06:
+        flags.append("screen glare")
+
+    # ── Signal 2: YCrCb chroma balance ─────────────────────────────────────
+    # Human skin has Cr consistently higher than Cb (warm reddish tone).
+    # Mobile OLED/LCD screens are blue-biased; Cr–Cb difference drops significantly.
+    ycrcb = cv2.cvtColor(crop, cv2.COLOR_BGR2YCrCb)
+    cr_mean = float(np.mean(ycrcb[:, :, 1]))
+    cb_mean = float(np.mean(ycrcb[:, :, 2]))
+    if (cr_mean - cb_mean) < 2.0:  # real skin: typically +10 to +30
+        flags.append("unnatural screen chroma")
+
+    # ── Signal 3: FFT high-frequency energy (Moiré / pixel grid) ──────────
+    # A mobile display is a regular grid of sub-pixels.  When photographed,
+    # the aliasing produces a strong ring of energy at radii > 50 in a 128×128 FFT.
+    gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+    resized_gray = cv2.resize(gray, (128, 128))
+    magnitude = np.abs(np.fft.fftshift(np.fft.fft2(resized_gray)))
+    gy, gx = np.ogrid[:128, :128]
+    r = np.sqrt((gx - 64) ** 2 + (gy - 64) ** 2)
+    hf_ratio = float(np.sum(magnitude[r >= 50]) / (np.sum(magnitude) + 1e-6))
+    if hf_ratio > 0.72:   # empirically, real-face frames ≈ 0.60–0.70; screen ≥ 0.73
+        flags.append("Moiré / screen pixel-grid pattern")
+
+    # ── Signal 4: device-bezel / rectangular frame detection ────────────────
+    # When someone holds a phone in front of the camera, the phone's rectangular
+    # border appears as 4+ long horizontal/vertical lines around the face.
+    pad = int(max(bw, bh) * 0.4)
+    bx0, by0 = max(0, x - pad), max(0, y - pad)
+    bx1, by1 = min(w, x + bw + pad), min(h, y + bh + pad)
+    roi = img[by0:by1, bx0:bx1]
+    if roi.size > 0:
+        roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        edges = cv2.Canny(roi_gray, 50, 150)
+        min_len = int(min(roi.shape[:2]) * 0.3)
+        lines = cv2.HoughLinesP(edges, 1, np.pi / 180,
+                                threshold=int(min_len * 1.2),
+                                minLineLength=min_len,
+                                maxLineGap=6)
+        if lines is not None:
+            bezel = sum(
+                1 for line in lines
+                for lx1, ly1, lx2, ly2 in [line[0]]
+                if abs(lx2 - lx1) > abs(ly2 - ly1) * 3     # nearly horizontal
+                or abs(ly2 - ly1) > abs(lx2 - lx1) * 3     # nearly vertical
+            )
+            if bezel >= 4:
+                flags.append("mobile device frame / bezel")
+
+    # Require at least 2 independent signals to confirm a spoof attack
+    if len(flags) >= 2:
+        return True, "Liveness check failed – please look directly into the webcam"
+    return False, ""

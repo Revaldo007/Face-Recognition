@@ -105,11 +105,21 @@ def recognize(
     results = []
     for face in detected:
         item = {"box": fd.face_box(img, face), "recognized": False}
+
+        # Quality gate
         problem = fd.face_problem(img, face)
         if problem:
             item.update(status="POOR_IMAGE", message=problem)
             results.append(item)
             continue
+
+        # Anti-spoofing gate – block mobile-screen / photo attacks
+        spoof, reason = fd.is_spoof_attack(img, face)
+        if spoof:
+            item.update(status="SPOOF_DETECTED", message=reason)
+            results.append(item)
+            continue
+
         student_id, distance = fr.best_match(fr.get_embedding(img, face), gallery)
         if student_id is None:
             item.update(status="NOT_RECOGNIZED", message="Student Not Recognized", distance=distance)
