@@ -95,7 +95,9 @@ export default function Login() {
         {/* ── Right: Decorative panel ── */}
         <div className="fas-panel">
           <div className="fas-panel-content">
-            <span className="fas-panel-emoji">🎓</span>
+            <div className="fas-panel-icon-wrap">
+              <GraduationCap size={44} strokeWidth={1.8} className="text-white" />
+            </div>
             <h1>Hello, Welcome!</h1>
             <p>Automated attendance<br />powered by facial recognition</p>
           </div>
@@ -247,7 +249,19 @@ export default function Login() {
           align-items: center;
           gap: 10px;
         }
-        .fas-panel-emoji { font-size: 52px; line-height: 1; }
+        .fas-panel-icon-wrap {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 76px;
+          height: 76px;
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          border-radius: 22px;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+          margin-bottom: 6px;
+        }
         .fas-panel h1 {
           font-size: 30px;
           font-weight: 700;

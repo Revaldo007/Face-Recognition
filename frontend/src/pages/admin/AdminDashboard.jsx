@@ -1,4 +1,12 @@
 import { useEffect, useState } from 'react'
+import {
+  GraduationCap,
+  UserCog,
+  Building2,
+  BookOpen,
+  BookMarked,
+  Camera,
+} from 'lucide-react'
 import api, { errorMessage } from '../../services/api'
 import { Alert, PageHeader, StatCard } from '../../components/ui'
 
@@ -19,12 +27,12 @@ export default function AdminDashboard() {
       <PageHeader title="Admin Dashboard" subtitle="Overview of the college attendance system" />
       <Alert>{error}</Alert>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label="Total Students" value={stats?.students} icon="🎓" color="indigo" />
-        <StatCard label="Total Faculty" value={stats?.faculty} icon="👨‍🏫" color="sky" />
-        <StatCard label="Total Departments" value={stats?.departments} icon="🏢" color="violet" />
-        <StatCard label="Total Courses" value={stats?.courses} icon="📚" color="amber" />
-        <StatCard label="Total Subjects" value={stats?.subjects} icon="📖" color="rose" />
-        <StatCard label="Sessions Today" value={today?.sessions} icon="📷" color="emerald" />
+        <StatCard label="Total Students" value={stats?.students} icon={<GraduationCap size={22} />} color="indigo" />
+        <StatCard label="Total Faculty" value={stats?.faculty} icon={<UserCog size={22} />} color="sky" />
+        <StatCard label="Total Departments" value={stats?.departments} icon={<Building2 size={22} />} color="violet" />
+        <StatCard label="Total Courses" value={stats?.courses} icon={<BookOpen size={22} />} color="amber" />
+        <StatCard label="Total Subjects" value={stats?.subjects} icon={<BookMarked size={22} />} color="rose" />
+        <StatCard label="Sessions Today" value={today?.sessions} icon={<Camera size={22} />} color="emerald" />
       </div>
 
       <div className="card mt-6">

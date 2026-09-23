@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { BarChart3, CheckCircle2, XCircle, Calendar } from 'lucide-react'
 import api, { errorMessage } from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
 import { Alert, PageHeader, PercentBadge, StatCard } from '../../components/ui'
@@ -21,10 +22,10 @@ export default function StudentDashboard() {
       </PageHeader>
       <Alert>{error}</Alert>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Overall Attendance" value={overall ? `${overall.percentage}%` : '-'} icon="📊" color="indigo" />
-        <StatCard label="Classes Attended" value={overall?.present} icon="✅" color="emerald" />
-        <StatCard label="Classes Missed" value={overall?.absent} icon="❌" color="rose" />
-        <StatCard label="Total Classes" value={overall?.classes} icon="🗓️" color="sky" />
+        <StatCard label="Overall Attendance" value={overall ? `${overall.percentage}%` : '-'} icon={<BarChart3 size={22} />} color="indigo" />
+        <StatCard label="Classes Attended" value={overall?.present} icon={<CheckCircle2 size={22} />} color="emerald" />
+        <StatCard label="Classes Missed" value={overall?.absent} icon={<XCircle size={22} />} color="rose" />
+        <StatCard label="Total Classes" value={overall?.classes} icon={<Calendar size={22} />} color="sky" />
       </div>
       {overall && overall.classes > 0 && overall.percentage < 75 && (
         <div className="mt-4"><Alert>Your attendance is below 75%. Please attend classes regularly.</Alert></div>

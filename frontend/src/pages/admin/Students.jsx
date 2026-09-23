@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Camera as CameraIcon } from 'lucide-react'
 import api, { errorMessage } from '../../services/api'
 import { Alert, Modal, PageHeader } from '../../components/ui'
 import Camera from '../../components/Camera'
@@ -165,7 +166,7 @@ export default function Students() {
       const fd = new FormData()
       captures.forEach((b, i) => fd.append('images', b, `photo${i}.jpg`))
       const res = await api.post(`/face/enroll/${faceModal.student.id}`, fd)
-      setEnrollResult({ ok: true, message: `✅ ${res.data.message} (${res.data.photos_used} photo${res.data.photos_used !== 1 ? 's' : ''} used)` })
+      setEnrollResult({ ok: true, message: `${res.data.message} (${res.data.photos_used} photo${res.data.photos_used !== 1 ? 's' : ''} used)` })
       load()   // refresh the face_enrolled badge
     } catch (err) {
       setEnrollResult({ ok: false, message: errorMessage(err) })
@@ -285,10 +286,11 @@ export default function Students() {
                     </button>
                     <button
                       type="button"
-                      className="btn-primary text-sm"
+                      className="btn-primary text-sm flex items-center gap-1.5"
                       onClick={capturePhoto}
                     >
-                      📸 Capture
+                      <CameraIcon size={15} />
+                      <span>Capture</span>
                     </button>
                   </div>
                 </div>
