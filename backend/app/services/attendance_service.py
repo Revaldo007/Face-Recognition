@@ -88,7 +88,6 @@ def close_session(db: Session, session: AttendanceSession) -> dict:
         if s.id not in already_recorded:
             db.add(Attendance(session_id=session.id, student_id=s.id, status="ABSENT", marked_at=now))
     session.status = "closed"
-    session.end_time = now.time().replace(microsecond=0)
     db.commit()
     db.refresh(session)
     return session_summary(db, session)
@@ -119,7 +118,6 @@ def session_summary(db: Session, session: AttendanceSession) -> dict:
         "faculty": session.faculty.name,
         "date": session.date.isoformat(),
         "start_time": session.start_time.isoformat(),
-        "end_time": session.end_time.isoformat() if session.end_time else None,
         "status": session.status,
         "total_students": total,
         "present_count": len(present),

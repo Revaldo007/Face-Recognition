@@ -111,7 +111,7 @@ erDiagram
     COURSES { int id PK string name string code UK int department_id FK string duration text description }
     SUBJECTS { int id PK string name string code UK int course_id FK int department_id FK int semester int faculty_id FK }
     FACE_DATA { int id PK int student_id FK_UK bytes face_embedding datetime created_at datetime updated_at }
-    ATTENDANCE_SESSIONS { int id PK int subject_id FK int faculty_id FK string section date date time start_time time end_time string status }
+    ATTENDANCE_SESSIONS { int id PK int subject_id FK int faculty_id FK string section date date time start_time string status }
     ATTENDANCE { int id PK int session_id FK int student_id FK datetime marked_at string status float recognition_distance }
 ```
 
@@ -177,7 +177,7 @@ flowchart TD
 | **courses** | id PK · name · code UNIQUE · department_id FK · duration · description |
 | **subjects** | id PK · name · code UNIQUE · course_id FK · department_id FK · semester · faculty_id FK (nullable) |
 | **face_data** | id PK · student_id FK UNIQUE · face_embedding (bytes, 128 × float32) · created_at · updated_at |
-| **attendance_sessions** | id PK · subject_id FK · faculty_id FK · section · date · start_time · end_time · status (active/closed) |
+| **attendance_sessions** | id PK · subject_id FK · faculty_id FK · section · date · start_time · status (active/closed) |
 | **attendance** | id PK · session_id FK · student_id FK · marked_at · status (PRESENT/ABSENT) · recognition_distance · **UNIQUE(session_id, student_id)** |
 
 *Design note:* `section` is stored on the session (in addition to the fields you specified) because a class is identified as Subject → Course + Semester, plus Section.

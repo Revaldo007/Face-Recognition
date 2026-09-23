@@ -38,7 +38,7 @@ export default function AttendanceRecords() {
                 <td className="td font-medium">{s.subject}</td>
                 <td className="td">{s.course} · Sem {s.semester} · {s.section}</td>
                 <td className="td">{s.faculty}</td>
-                <td className="td whitespace-nowrap">{fmtTime(s.start_time)} - {fmtTime(s.end_time)}</td>
+                <td className="td whitespace-nowrap">{fmtTime(s.start_time)}</td>
                 <td className="td">{s.total_students}</td>
                 <td className="td text-emerald-600">{s.present_count}</td>
                 <td className="td text-rose-600">{s.absent_count}</td>

@@ -15,7 +15,6 @@ class AttendanceSession(Base):
     section: Mapped[str] = mapped_column(String(10))
     date: Mapped[dt.date] = mapped_column(Date)
     start_time: Mapped[dt.time] = mapped_column(Time)
-    end_time: Mapped[dt.time | None] = mapped_column(Time, nullable=True)
     status: Mapped[str] = mapped_column(String(10), default="active")  # active | closed
 
     subject = relationship("Subject")
