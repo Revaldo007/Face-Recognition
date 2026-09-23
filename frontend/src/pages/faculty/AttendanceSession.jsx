@@ -77,8 +77,8 @@ export default function AttendanceSession() {
   // ------------------------------------------------ 1) Start form
   if (!session) {
     return (
-      <div>
-        <PageHeader title="Attendance Session" subtitle="Choose the class and start taking attendance with the camera" />
+      <div className="flex flex-1 flex-col min-h-0">
+        <PageHeader className="!mb-4 shrink-0" title="Attendance Session" subtitle="Choose the class and start taking attendance with the camera" />
         <form onSubmit={start} className="card max-w-xl space-y-4">
           <Alert>{error}</Alert>
           <div>
@@ -102,17 +102,17 @@ export default function AttendanceSession() {
   // ------------------------------------------------ 2) Closed: summary with absent students
   if (!active) {
     return (
-      <div>
-        <PageHeader title="Session Summary" subtitle={`${session.subject} · ${session.course} · Section ${session.section}`}>
+      <div className="flex flex-1 flex-col min-h-0">
+        <PageHeader className="!mb-4 shrink-0" title="Session Summary" subtitle={`${session.subject} · ${session.course} · Section ${session.section}`}>
           <button className="btn-primary" onClick={() => { setSession(null); setLast(null) }}>New Session</button>
         </PageHeader>
-        <div className="mb-5 grid gap-4 sm:grid-cols-4">
+        <div className="mb-4 grid gap-3 sm:grid-cols-4 shrink-0">
           <Stat label="Total Students" value={session.total_students} />
           <Stat label="Present" value={session.present_count} color="text-emerald-600" />
           <Stat label="Absent" value={session.absent_count} color="text-rose-600" />
           <Stat label="Attendance" value={<PercentBadge value={session.percentage} total={session.total_students} />} />
         </div>
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2 flex-1 min-h-0">
           <StudentList title="Present Students" rows={session.present} status="PRESENT" />
           <StudentList title="Absent Students" rows={session.absent} status="ABSENT" />
         </div>
@@ -123,39 +123,120 @@ export default function AttendanceSession() {
   // ------------------------------------------------ 3) Active: camera + live info
   const faceOk = boxes.length > 0
   return (
-    <div>
-      <PageHeader title="Attendance Session" subtitle={`${session.subject} · ${session.course} · Sem ${session.semester} · Section ${session.section} · ${fmtDate(session.date)} ${fmtTime(session.start_time)}`}>
+    <div className="flex flex-1 flex-col min-h-0">
+      <PageHeader
+        className="!mb-3 shrink-0"
+        title="Attendance Session"
+        subtitle={`${session.subject} · ${session.course} · Sem ${session.semester} · Section ${session.section} · ${fmtDate(session.date)} ${fmtTime(session.start_time)}`}
+      >
         <StatusBadge status="active" />
-        <button className="btn-secondary" onClick={() => setScanning((s) => !s)}>{scanning ? 'Pause' : 'Resume'}</button>
-        <button className="btn-danger" onClick={endSession}>End Session</button>
+        <button className="btn-secondary text-sm" onClick={() => setScanning((s) => !s)}>
+          {scanning ? 'Pause' : 'Resume'}
+        </button>
+        <button className="btn-danger text-sm" onClick={endSession}>
+          End Session
+        </button>
       </PageHeader>
-      <Alert type="info">{info}</Alert>
-      <Alert>{error}</Alert>
 
-      <div className="mt-3 grid gap-6 lg:grid-cols-5">
-        <div className="space-y-4 lg:col-span-3">
-          <Camera ref={cameraRef} boxes={boxes} statusText={faceOk ? '[ Face Detected ]' : message} />
-          <div className="card">
-            <p className="mb-2 text-sm text-slate-500">{message}</p>
+      {info && <div className="mb-2 shrink-0"><Alert type="info">{info}</Alert></div>}
+      {error && <div className="mb-2 shrink-0"><Alert>{error}</Alert></div>}
+
+      <div className="grid gap-4 lg:grid-cols-12 flex-1 min-h-0">
+        {/* Left column: Camera + Live recognition status (7 cols) */}
+        <div className="lg:col-span-7 flex flex-col justify-between min-h-0 gap-2.5">
+          {/* Camera Viewfinder */}
+          <div className="card !p-2.5 flex items-center justify-center bg-slate-900 overflow-hidden shrink-0">
+            <Camera
+              ref={cameraRef}
+              boxes={boxes}
+              statusText={faceOk ? '[ Face Detected ]' : message}
+              className="max-h-[310px] 2xl:max-h-[400px] max-w-[460px] mx-auto shadow-md"
+            />
+          </div>
+
+          {/* Live Recognition Status Card */}
+          <div className="card !p-3 flex flex-col justify-center shrink-0">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-1.5 mb-2">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <span className={`inline-block h-2 w-2 rounded-full ${faceOk ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`}></span>
+                Live Face Recognition
+              </span>
+              <span className="text-xs text-slate-500 font-medium">{message}</span>
+            </div>
+
             {last?.student ? (
-              <div className="space-y-1">
-                <p><span className="text-slate-500">Student:</span> <b>{last.student.name}</b> ({last.student.roll_number})</p>
-                <p><span className="text-slate-500">Status:</span> <StatusBadge status="PRESENT" /> {last.status === 'ALREADY_MARKED' && <span className="text-xs text-slate-500">(already marked)</span>}</p>
-                <p><span className="text-slate-500">Time:</span> {last.time}</p>
+              <div className="flex items-center justify-between gap-3 bg-emerald-50/70 border border-emerald-200 rounded-lg px-3 py-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-8 w-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm shrink-0">
+                    {last.student.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-900 leading-tight">{last.student.name}</p>
+                    <p className="text-xs text-slate-500">{last.student.roll_number}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {last.status === 'ALREADY_MARKED' ? (
+                    <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">Already Marked</span>
+                  ) : (
+                    <StatusBadge status="PRESENT" />
+                  )}
+                  {last.time && <span className="text-xs font-mono text-slate-600 bg-white border border-slate-200 rounded px-2 py-0.5">{last.time}</span>}
+                </div>
               </div>
             ) : last ? (
-              <p className={last.status === 'NOT_RECOGNIZED' ? 'font-semibold text-rose-600' : 'text-amber-600'}>{last.message}</p>
-            ) : <p className="text-slate-400">Waiting for a face...</p>}
+              <div className={`rounded-lg px-3 py-2 text-xs font-medium ${
+                last.status === 'NOT_RECOGNIZED' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+              }`}>
+                {last.message}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400 italic py-1 text-center">Waiting for a face in front of the camera...</p>
+            )}
           </div>
         </div>
 
-        <div className="space-y-4 lg:col-span-2">
-          <div className="grid grid-cols-3 gap-3">
+        {/* Right column: Stats + Scrollable Marked Present List (5 cols) */}
+        <div className="lg:col-span-5 flex flex-col min-h-0 gap-2.5">
+          {/* Top Stats */}
+          <div className="grid grid-cols-3 gap-2 shrink-0">
             <Stat label="Total" value={session.total_students} />
             <Stat label="Present" value={session.present_count} color="text-emerald-600" />
             <Stat label="Yet to mark" value={session.absent_count} color="text-amber-600" />
           </div>
-          <StudentList title="Marked Present" rows={session.present} status="PRESENT" showTime />
+
+          {/* Marked Present List */}
+          <div className="card !p-0 flex flex-1 flex-col min-h-0 overflow-hidden">
+            <div className="border-b border-slate-200 px-3.5 py-2 font-semibold text-sm flex items-center justify-between bg-slate-50/50 shrink-0">
+              <span className="flex items-center gap-2">
+                <span>Marked Present</span>
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700">
+                  {session.present.length}
+                </span>
+              </span>
+              <span className="text-xs font-normal text-slate-500">Live feed</span>
+            </div>
+            <ul className="divide-y divide-slate-100 overflow-y-auto flex-1 min-h-0">
+              {session.present.length === 0 && (
+                <li className="flex flex-col items-center justify-center p-8 text-center text-sm text-slate-400">
+                  <span className="text-2xl mb-1">⏳</span>
+                  <span>No students marked yet</span>
+                </li>
+              )}
+              {session.present.map((s) => (
+                <li key={s.id} className="flex items-center justify-between px-3.5 py-2 text-sm hover:bg-slate-50">
+                  <div>
+                    <b className="text-slate-800">{s.name}</b>
+                    <span className="ml-2 text-xs text-slate-400 font-mono">{s.roll_number}</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {s.time && <span className="text-xs font-mono text-slate-500">{s.time}</span>}
+                    <StatusBadge status="PRESENT" />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -163,19 +244,33 @@ export default function AttendanceSession() {
 }
 
 function Stat({ label, value, color = '' }) {
-  return <div className="card !p-4 text-center"><p className="text-xs text-slate-500">{label}</p><p className={`text-2xl font-bold ${color}`}>{value}</p></div>
+  return (
+    <div className="card !p-2.5 text-center">
+      <p className="text-[11px] font-medium uppercase tracking-wider text-slate-500">{label}</p>
+      <p className={`text-xl font-bold ${color}`}>{value}</p>
+    </div>
+  )
 }
 
 function StudentList({ title, rows, status, showTime }) {
   return (
-    <div className="card !p-0">
-      <div className="border-b border-slate-200 px-4 py-3 font-semibold">{title} ({rows.length})</div>
-      <ul className="max-h-80 divide-y divide-slate-100 overflow-y-auto">
-        {rows.length === 0 && <li className="px-4 py-4 text-center text-sm text-slate-400">None</li>}
+    <div className="card !p-0 flex flex-1 flex-col min-h-0 overflow-hidden">
+      <div className="border-b border-slate-200 px-4 py-2.5 font-semibold text-sm flex items-center justify-between shrink-0 bg-slate-50/50">
+        <span>{title}</span>
+        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">{rows.length}</span>
+      </div>
+      <ul className="divide-y divide-slate-100 overflow-y-auto flex-1 min-h-0 max-h-72">
+        {rows.length === 0 && <li className="px-4 py-6 text-center text-sm text-slate-400">None</li>}
         {rows.map((s) => (
-          <li key={s.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
-            <span><b>{s.name}</b> <span className="text-slate-400">{s.roll_number}</span></span>
-            <span className="flex items-center gap-2">{showTime && <span className="text-xs text-slate-500">{s.time}</span>}<StatusBadge status={status} /></span>
+          <li key={s.id} className="flex items-center justify-between px-4 py-2 text-sm hover:bg-slate-50">
+            <div>
+              <b className="text-slate-800">{s.name}</b>
+              <span className="ml-2 text-slate-400 text-xs font-mono">{s.roll_number}</span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {showTime && s.time && <span className="text-xs font-mono text-slate-500">{s.time}</span>}
+              <StatusBadge status={status} />
+            </div>
           </li>
         ))}
       </ul>

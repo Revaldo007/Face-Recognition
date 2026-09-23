@@ -6,7 +6,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 're
  *  - boxes: [{x, y, w, h, color, label}]  fractions (0-1) from the backend, drawn over the video
  * The video is mirrored (like a selfie) so it feels natural; the captured image is NOT mirrored.
  */
-const Camera = forwardRef(function Camera({ boxes = [], active = true, statusText }, ref) {
+const Camera = forwardRef(function Camera({ boxes = [], active = true, statusText, className = '' }, ref) {
   const videoRef = useRef(null)
   const streamRef = useRef(null)
   const [state, setState] = useState('starting') // starting | ready | error
@@ -65,7 +65,7 @@ const Camera = forwardRef(function Camera({ boxes = [], active = true, statusTex
   const colors = { green: 'border-emerald-400', red: 'border-rose-500', amber: 'border-amber-400' }
 
   return (
-    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-slate-900">
+    <div className={`relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-slate-900 ${className}`}>
       <video ref={videoRef} playsInline muted className="h-full w-full -scale-x-100 object-cover" />
 
       {state === 'ready' && boxes.map((b, i) => (

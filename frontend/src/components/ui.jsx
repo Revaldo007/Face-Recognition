@@ -51,9 +51,9 @@ export function Alert({ type = 'error', children }) {
   return <div className={`rounded-lg px-4 py-2.5 text-sm ring-1 ${styles[type]}`}>{children}</div>
 }
 
-export function PageHeader({ title, subtitle, children }) {
+export function PageHeader({ title, subtitle, className = '', children }) {
   return (
-    <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+    <div className={`mb-5 flex flex-wrap items-center justify-between gap-3 ${className}`}>
       <div>
         <h2 className="text-xl font-bold">{title}</h2>
         {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
