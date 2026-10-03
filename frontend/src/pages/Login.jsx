@@ -5,6 +5,7 @@ import { errorMessage } from '../services/api'
 import { User, GraduationCap, Eye, EyeOff, CheckCircle2, ArrowRight, Loader2 } from 'lucide-react'
 import ProjectTitle from '../components/ProjectTitle'
 import DemoAccounts from '../components/DemoAccounts'
+import Badge from '../components/Badge'
 
 export default function Login() {
   const { user, login } = useAuth()
@@ -163,13 +164,19 @@ export default function Login() {
 
       </div>
 
+      {/* Credits badge - bottom-right corner */}
+      <Badge />
+
       <style>{`
         .fas-wrapper {
           min-height: 100vh;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg, #f1f5f9 0%, #e0e7ff 100%);
+          background:
+            radial-gradient(circle at 88% 8%, rgba(99, 102, 241, .09), transparent 38%),
+            radial-gradient(circle at 8% 92%, rgba(6, 182, 212, .09), transparent 38%),
+            linear-gradient(135deg, #f8fafc 0%, #eef2f7 55%, #e5eaf1 100%);
           flex-direction: column;
           gap: 20px;
           padding: 24px 16px;
