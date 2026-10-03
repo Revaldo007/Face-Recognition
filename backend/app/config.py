@@ -9,7 +9,7 @@ load_dotenv(BASE_DIR / ".env")
 class Settings:
     DATABASE_URL = os.getenv(
         "DATABASE_URL",
-        "postgresql+psycopg2://postgres:postgres@localhost:5432/attendance_db",
+        "postgresql+pg8000://postgres:postgres@localhost:5432/attendance_db",
     )
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-me")
     ALGORITHM = "HS256"

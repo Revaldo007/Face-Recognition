@@ -45,7 +45,7 @@ copy .env.example .env                # macOS/Linux: cp .env.example .env
 Open `backend/.env` and set your PostgreSQL password in `DATABASE_URL`:
 
 ```
-DATABASE_URL=postgresql+psycopg2://postgres:YOUR_PASSWORD@localhost:5432/attendance_db
+DATABASE_URL=postgresql+pg8000://postgres:YOUR_PASSWORD@localhost:5432/attendance_db
 ```
 
 Create tables + demo data, then start the server:

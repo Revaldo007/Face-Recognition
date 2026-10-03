@@ -3,10 +3,21 @@ from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
 from app.config import settings
 
+db_url = settings.DATABASE_URL
+if db_url.startswith("postgresql+psycopg2://") or db_url.startswith("postgresql://"):
+    try:
+        import psycopg2  # noqa: F401
+    except Exception:
+        # Fall back to pure-Python pg8000 driver (avoids Windows Application Control DLL block)
+        if db_url.startswith("postgresql+psycopg2://"):
+            db_url = db_url.replace("postgresql+psycopg2://", "postgresql+pg8000://", 1)
+        elif db_url.startswith("postgresql://"):
+            db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
+
 engine = create_engine(
-    settings.DATABASE_URL,
+    db_url,
     pool_pre_ping=True,
-    connect_args={"check_same_thread": False} if settings.DATABASE_URL.startswith("sqlite") else {},
+    connect_args={"check_same_thread": False} if db_url.startswith("sqlite") else {},
 )
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 

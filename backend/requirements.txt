@@ -1,7 +1,8 @@
 fastapi>=0.115
 uvicorn[standard]>=0.30
 sqlalchemy>=2.0.30
-psycopg2-binary>=2.9.10
+psycopg2-binary>=2.9.10; sys_platform != "win32"
+pg8000>=1.31.0
 pydantic>=2.8
 email-validator>=2.1
 python-multipart>=0.0.9
